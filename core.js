@@ -107,7 +107,43 @@
 
 (function(X){
     var doc = document,EMPTY = '',
-        trim = X.trim;
+        trim = X.trim,
+        __display = function(selector,option){
+
+            var __self = this,
+                isArray = X.isArray,
+                isString = X.isString,
+                isNodeList = X.isNodeList,
+                __option = function(i){
+
+                    if(option =='hide'){
+
+                        i.style.display = 'none';
+
+                    }else if(option =='show'){
+
+                        i.style.display = 'block';
+
+                    }else{
+
+                    }
+                }
+            isString(selector) && (selector = __self.query(selector));
+
+            isArray(selector)|| isNodeList (selector) ? (function(selector){
+
+                X.each(selector,function(i){
+
+                    __option(i);
+
+                })
+
+            })(selector): (function(i){
+
+                __option(i);
+
+            })(selector)
+        };
 
     X.mix(X[arguments[1]] = {},{
         /**
@@ -164,64 +200,24 @@
         data:function(){
 
         },
-        __display:function(selector,option){
 
-            var __self = this,
-                isArray = X.isArray,
-                isString = X.isString,
-                isNodeList = X.isNodeList,
-                __option = function(i){
-
-                if(option =='hide'){
-
-                    i.style.display = 'none';
-
-                }else if(option =='show'){
-
-                    i.style.display = 'block';
-
-                }else{
-
-                }
-            }
-            isString(selector) && (selector = __self.query(selector));
-
-            isArray(selector)|| isNodeList (selector) ? (function(selector){
-
-                X.each(selector,function(i){
-
-                    __option(i);
-
-                })
-
-            })(selector): (function(i){
-
-                __option(i);
-
-            })(selector)
-        },
         /**
          * Òþ²ØÔªËØ
          */
         hide:function(selector){
 
-            var __self = this;
 
-            __self.__display(selector,'hide');
+            __display(selector,'hide');
 
         },
         /**
          * ÏÔÊ¾ÔªËØ
          */
         show:function(selector){
-            var __self = this;
-
-            __self.__display(selector,'show');
+            __display(selector,'show');
         },
         toggle:function(selector){
-            var __self = this;
-
-            __self.__display(selector);
+            __display(selector);
         }
     });
 })(XDF,'DOM');
