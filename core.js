@@ -13,7 +13,11 @@
                 return r;
             }
         },
-        EMPTY = '';
+        EMPTY = '',
+        __isXDF = function(source,option){
+
+            return  option ==  Object.prototype.toString.call(source);
+        };
 
 
     //基础工具方法
@@ -75,28 +79,25 @@
         /**
          * 数据类型检测
          */
-        __isXDF:function(source,option){
 
-            return  option ==  Object.prototype.toString.call(source);
-        },
         isArray :function (source) {
 
-            return X.__isXDF(source,'[object Array]');
+            return __isXDF(source,'[object Array]');
 
         },
         isNodeList :function (source) {
 
-            return X.__isXDF(source,'[object NodeList]');
+            return __isXDF(source,'[object NodeList]');
 
         },
         isString: function(source){
 
-            return X.__isXDF(source,'[object String]');
+            return __isXDF(source,'[object String]');
 
         },
         isFunction: function(source){
 
-            return X.__isXDF(source,'[object Function]');
+            return __isXDF(source,'[object Function]');
 
         }
 
