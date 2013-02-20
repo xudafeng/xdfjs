@@ -228,31 +228,33 @@
 (function(X){
     var __self = this,
         D = X.DOM,
+        W = window,
         isNodeList = X.isNodeList,
         isString = X.isString,
-        isArray = X.isArray;
+
+        __add = function(elm,type,handle){
+
+            if(elm.addEventListener){//通用事件捆绑
+                elm.addEventListener(type,handle,false);
+            } else if (elm.attachEvent){
+                elm.attachEvent('on'+type,handle);  //针对ie的保险捆绑
+            } else {
+                elm['on'+ type]  = handle; //现存的DOM0基本古老方式
+            }
+
+        };
 
     X.mix(X[arguments[1]] = {},{
         add:function(elm,type,handle){
 
-            var __add = function(elm){
-                if(elm.addEventListener){//通用事件捆绑
-                    elm.addEventListener(type,handle,false);
-                } else if (elm.attachEvent){
-                    elm.attachEvent('on'+type,handle);  //针对ie的保险捆绑
-                } else {
-                    elm['on'+ type]  = handle; //现存的DOM0基本古老方式
-                }
-            }
-
-            elm = isString(elm) ? D.query(elm) : elm;
+            var elm = isString(elm) ? D.query(elm) : elm;
 
             if(isNodeList(elm)){  //支持批量循环绑定
                 X.each(elm,function(i){
-                    __add(i);
+                    __add(i,type,handle);
                 })
             }else{
-                __add(elm);
+                __add(elm,type,handle);
             }
 
             return elm;
@@ -261,41 +263,33 @@
             this.add.apply(__self,arguments);
             return elm;
         },
-        delegate:function(container,elm,type,handle){ //支持事件委托绑定，完成代理功能
+        delegate:function(container,selector,type,handle){ //支持事件委托绑定，完成代理功能
 
             var container = isString(container) ? D.query(container) : container;
 
             var __handle = function(e) {
 
                 function getEventTarget(e) {
-                    e = e || window.event;
+                    e = e || W.event;
                     return e.target || e.srcElement;
                 }
 
-                if(getEventTarget(e).tagName.toLowerCase() === elm) {
+                if(getEventTarget(e).tagName.toLowerCase() === selector) {
 
                     handle.call(__self,e);
 
                 }
             }
 
-            var __add = function(container){
-
-                if(container.addEventListener){//通用事件捆绑
-                    container.addEventListener(type,__handle,false);
-                }
-            }
-
             if(isNodeList(container)){  //支持批量循环绑定
                 X.each(container,function(i){
-                    __add(i);
+                    __add(i,type,__handle);
                 })
             }else{
-                __add(container);
+                __add(container,type,__handle);
             }
 
             return container;
-
 
         }
     });
