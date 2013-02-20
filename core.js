@@ -93,6 +93,11 @@
 
             return X.__isXDF(source,'[object String]');
 
+        },
+        isFunction: function(source){
+
+            return X.__isXDF(source,'[object Function]');
+
         }
 
     });
@@ -230,11 +235,6 @@
     X.mix(X[arguments[1]] = {},{
         add:function(elm,type,handle){
 
-            if(isArray(elm)){  //实现事件代理
-
-            }else{
-
-            }
             var __add = function(elm){
                 if(elm.addEventListener){//通用事件捆绑
                     elm.addEventListener(type,handle,false);
@@ -261,33 +261,42 @@
             this.add.apply(__self,arguments);
             return elm;
         },
-        delegate:function(container,type,elm,handle){ //支持事件委托绑定，完成代理功能
+        delegate:function(container,elm,type,handle){ //支持事件委托绑定，完成代理功能
 
-            var target = isString(container) ? D.query(container) : container;
+            var container = isString(container) ? D.query(container) : container;
 
-            this.add([target,elm],type,handle);
+            var __handle = function(e) {
 
-
-        },
-        __delegate:function(targets, type, selector, fn, scope) {
-            if (batchForType(Event, 'delegate', targets, type, selector, fn, scope)) {
-                return targets;
-            }
-            DOM.query(targets).each(function(target) {
-                var preType = type,handler = delegateHandler;
-                if (delegateMap[type]) {
-                    type = delegateMap[preType].type;
-                    handler = delegateMap[preType].handler || handler;
+                function getEventTarget(e) {
+                    e = e || window.event;
+                    return e.target || e.srcElement;
                 }
-                Event.on(target, type, handler, target, {
-                    fn:fn,
-                    selector:selector,
-                    preType:preType,
-                    scope:scope,
-                    equals:equals
-                });
-            });
-            return targets;
+
+                if(getEventTarget(e).tagName.toLowerCase() === elm) {
+
+                    handle.call(__self,e);
+
+                }
+            }
+
+            var __add = function(container){
+
+                if(container.addEventListener){//通用事件捆绑
+                    container.addEventListener(type,__handle,false);
+                }
+            }
+
+            if(isNodeList(container)){  //支持批量循环绑定
+                X.each(container,function(i){
+                    __add(i);
+                })
+            }else{
+                __add(container);
+            }
+
+            return container;
+
+
         }
     });
 })(XDF,'Event');
