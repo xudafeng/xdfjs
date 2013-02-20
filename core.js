@@ -108,7 +108,7 @@
 (function(X){
     var doc = document,EMPTY = '',
         trim = X.trim,
-        __display = function(selector,option){
+        __display = function(selector,option,queryHandle){
 
             var __self = this,
                 isArray = X.isArray,
@@ -128,7 +128,7 @@
 
                     }
                 }
-            isString(selector) && (selector = __self.query(selector));
+            isString(selector) && (selector = queryHandle(selector));
 
             isArray(selector)|| isNodeList (selector) ? (function(selector){
 
@@ -207,17 +207,17 @@
         hide:function(selector){
 
 
-            __display(selector,'hide');
+            __display(selector,'hide',this.query);
 
         },
         /**
          * ÏÔÊ¾ÔªËØ
          */
         show:function(selector){
-            __display(selector,'show');
+            __display(selector,'show',this.query);
         },
         toggle:function(selector){
-            __display(selector);
+            __display(selector,'',this.query);
         }
     });
 })(XDF,'DOM');
