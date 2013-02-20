@@ -108,13 +108,12 @@
 (function(X){
     var doc = document,EMPTY = '',
         trim = X.trim,
+        isArray = X.isArray,
+        isString = X.isString,
+        isNodeList = X.isNodeList,
         __display = function(selector,option,queryHandle){
 
-            var __self = this,
-                isArray = X.isArray,
-                isString = X.isString,
-                isNodeList = X.isNodeList,
-                __option = function(i){
+            var __option = function(i){
 
                     if(option =='hide'){
 
@@ -130,19 +129,12 @@
                 }
             isString(selector) && (selector = queryHandle(selector));
 
-            isArray(selector)|| isNodeList (selector) ? (function(selector){
-
-                X.each(selector,function(i){
+            isArray(selector)|| isNodeList (selector) ? X.each(selector,function(i){
 
                     __option(i);
 
-                })
+                }): __option(selector);
 
-            })(selector): (function(i){
-
-                __option(i);
-
-            })(selector)
         };
 
     X.mix(X[arguments[1]] = {},{
@@ -214,10 +206,14 @@
          * 显示元素
          */
         show:function(selector){
+
             __display(selector,'show',this.query);
+
         },
         toggle:function(selector){
+
             __display(selector,'',this.query);
+
         }
     });
 })(XDF,'DOM');
@@ -232,34 +228,47 @@
         __add = function(elm,type,handle){
 
             if(elm.addEventListener){//通用事件捆绑
+
                 elm.addEventListener(type,handle,false);
+
             } else if (elm.attachEvent){
+
                 elm.attachEvent('on'+type,handle);  //针对ie的保险捆绑
+
             } else {
+
                 elm['on'+ type]  = handle; //现存的DOM0基本古老方式
             }
 
         };
 
     X.mix(X[arguments[1]] = {},{
+
         add:function(elm,type,handle){
 
             var elm = isString(elm) ? D.query(elm) : elm;
 
             if(isNodeList(elm)){  //支持批量循环绑定
+
                 X.each(elm,function(i){
                     __add(i,type,handle);
                 })
+
             }else{
+
                 __add(elm,type,handle);
             }
 
             return elm;
         },
+
         on:function(elm,type,handle){    //直接调用add
+
             this.add.apply(__self,arguments);
             return elm;
+
         },
+
         delegate:function(container,selector,type,handle){ //支持事件委托绑定，完成代理功能
 
             var container = isString(container) ? D.query(container) : container;
@@ -279,9 +288,11 @@
             }
 
             if(isNodeList(container)){  //支持批量循环绑定
+
                 X.each(container,function(i){
                     __add(i,type,__handle);
                 })
+
             }else{
                 __add(container,type,__handle);
             }
@@ -303,6 +314,7 @@
 
         }
     });
+
 })(XDF,'Ajax');
 (function(X){  //客户端信息
     var __self = this;
