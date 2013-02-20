@@ -99,6 +99,94 @@
 
             return __isXDF(source,'[object Function]');
 
+        },
+        /**
+         * 加载工具
+         */
+        getScript:function(url, success, charset) {
+            if (utils.isCss(url)) {
+                return S.getStyle(url, success, charset);
+            }
+            var doc = document,
+                head = doc.head || doc.getElementsByTagName("head")[0],
+                node = doc.createElement('script'),
+                config = success,
+                error,
+                timeout,
+                timer;
+
+            if (S.isPlainObject(config)) {
+                success = config.success;
+                error = config.error;
+                timeout = config.timeout;
+                charset = config.charset;
+            }
+
+            function clearTimer() {
+                if (timer) {
+                    timer.cancel();
+                    timer = undefined;
+                }
+            }
+
+
+            node.src = url;
+            node.async = true;
+            if (charset) {
+                node.charset = charset;
+            }
+            if (success || error) {
+                scriptOnload(node, function() {
+                    clearTimer();
+                    S.isFunction(success) && success.call(node);
+                });
+
+                if (S.isFunction(error)) {
+
+                    //标准浏览器
+                    if (doc.addEventListener) {
+                        node.addEventListener("error", function() {
+                            clearTimer();
+                            error.call(node);
+                        }, false);
+                    }
+
+                    timer = S.later(function() {
+                        timer = undefined;
+                        error();
+                    }, (timeout || this.Config.timeout) * MILLISECONDS_OF_SECOND);
+                }
+            }
+            head.insertBefore(node, head.firstChild);
+            return node;
+        },
+        /**
+         * 加载样式
+         */
+        getStyle:function(url, success, charset) {
+            var doc = document,
+                head = utils.docHead(),
+                node = doc.createElement('link'),
+                config = success;
+
+            if (S.isPlainObject(config)) {
+                success = config.success;
+                charset = config.charset;
+            }
+
+            node.href = url;
+            node.rel = 'stylesheet';
+
+            if (charset) {
+                node.charset = charset;
+            }
+
+            if (success) {
+                utils.scriptOnload(node, success);
+            }
+            head.appendChild(node);
+            return node;
+
         }
 
     });
