@@ -135,7 +135,6 @@
                 }
             }
 
-
             node.src = url;
             node.async = true;
             if (charset) {
@@ -403,8 +402,9 @@
             method:'POST',//Ä¬ÈÏpost·½Ê½
             url:'/',
             async:false,
+            data:null,
             success:function(e){
-                alert(e);
+                X.log(e);
             }
         };
 
@@ -415,27 +415,28 @@
                url =  __config['url']||__defaulConfig['url'],
                successHandle = __config['success']||__defaulConfig['success'],
                async = __config['async']||__defaulConfig['async'],
+               data = __config['data']||__defaulConfig['data'],
                xmlHttp;
 
-            if (window.XMLHttpRequest){
+            if (__self.XMLHttpRequest){
                 xmlHttp=new XMLHttpRequest();
             }
             else{           //for IE6, IE5
                 xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
             }
+
             xmlHttp.onreadystatechange=function(){
                 if (xmlHttp.readyState==4 && xmlHttp.status==200){
                     successHandle(xmlHttp.responseText);
                 }
             }
             xmlHttp.open(method,url+'?t='+ X.now(),async);
+            xmlHttp.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+            xmlHttp.setRequestHeader('data',data);
             xmlHttp.send();
 
         },
         parse:function(){
-
-        },
-        toString :function(){
 
         }
     });
@@ -449,6 +450,9 @@
 
         },
         browser:function(){
+
+        },
+        core:function(){
 
         }
     });
