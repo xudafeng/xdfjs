@@ -65,6 +65,12 @@
 
         },
         /**
+         * 返回当前时间戳
+         */
+        now:function(){
+            return +new Date();
+        },
+        /**
          * 封装字符探针indexof
          */
         indexOf:function (i, objective) {
@@ -77,7 +83,7 @@
            }
         },
         /**
-         * 数据类型检测
+         * 安全数据类型检测
          */
 
         isArray :function (source) {
@@ -392,13 +398,44 @@
 })(XDF,'Event');
 
 (function(X){ //ajax模块
-    var __self = this;
+    var __self = this,
+        __defaulConfig = {
+            method:'POST',//默认post方式
+            url:'/',
+            async:false,
+            success:function(e){
+                alert(e);
+            }
+        };
 
     X.mix(X[arguments[1]] = {},{
-        add:function(){
+
+        io:function(__config){
+           var method = __config['method']||__defaulConfig['method'],
+               url =  __config['url']||__defaulConfig['url'],
+               successHandle = __config['success']||__defaulConfig['success'],
+               async = __config['async']||__defaulConfig['async'],
+               xmlHttp;
+
+            if (window.XMLHttpRequest){
+                xmlHttp=new XMLHttpRequest();
+            }
+            else{           //for IE6, IE5
+                xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            xmlHttp.onreadystatechange=function(){
+                if (xmlHttp.readyState==4 && xmlHttp.status==200){
+                    successHandle(xmlHttp.responseText);
+                }
+            }
+            xmlHttp.open(method,url+'?t='+ X.now(),async);
+            xmlHttp.send();
 
         },
-        delegate:function(){
+        parse:function(){
+
+        },
+        toString :function(){
 
         }
     });
