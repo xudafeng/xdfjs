@@ -409,7 +409,156 @@
             success:function(e){
                 X.log(e);
             }
+        },
+        win = window,
+        JSON = win.JSON;
+
+    function __f(n) {
+        // Format integers to have at least two digits.
+        return n < 10 ? '0' + n : n;
+    }
+
+    if (typeof Date.prototype.toJSON !== 'function') {
+
+        Date.prototype.toJSON = function (key) {
+
+            return isFinite(this.valueOf()) ?
+                this.getUTCFullYear() + '-' +
+                    __f(this.getUTCMonth() + 1) + '-' +
+                    __f(this.getUTCDate()) + 'T' +
+                    __f(this.getUTCHours()) + ':' +
+                    __f(this.getUTCMinutes()) + ':' +
+                    __f(this.getUTCSeconds()) + 'Z' : null;
         };
+
+        String.prototype.toJSON =
+            Number.prototype.toJSON =
+                Boolean.prototype.toJSON = function (key) {
+                    return this.valueOf();
+                };
+    }
+
+    var cx = /[\u0000\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        escapable = /[\\\"\x00-\x1f\x7f-\x9f\u00ad\u0600-\u0604\u070f\u17b4\u17b5\u200c-\u200f\u2028-\u202f\u2060-\u206f\ufeff\ufff0-\uffff]/g,
+        gap,
+        indent,
+        meta = {    // table of character substitutions
+            '\b': '\\b',
+            '\t': '\\t',
+            '\n': '\\n',
+            '\f': '\\f',
+            '\r': '\\r',
+            '"' : '\\"',
+            '\\': '\\\\'
+        },
+        rep;
+
+
+    function quote(string) {
+
+        escapable['lastIndex'] = 0;
+        return escapable.test(string) ?
+            '"' + string.replace(escapable, function (a) {
+                var c = meta[a];
+                return typeof c === 'string' ? c :
+                    '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+            }) + '"' :
+            '"' + string + '"';
+    }
+
+
+    function str(key, holder) {
+
+
+        var i,          // The loop counter.
+            k,          // The member key.
+            v,          // The member value.
+            length,
+            mind = gap,
+            partial,
+            value = holder[key];
+
+        if (value && typeof value === 'object' &&
+            typeof value.toJSON === 'function') {
+            value = value.toJSON(key);
+        }
+
+
+        if (typeof rep === 'function') {
+            value = rep.call(holder, key, value);
+        }
+
+
+        switch (typeof value) {
+            case 'string':
+                return quote(value);
+
+            case 'number':
+
+                return isFinite(value) ? String(value) : 'null';
+
+            case 'boolean':
+            case 'null':
+
+                return String(value);
+
+            case 'object':
+
+                if (!value) {
+                    return 'null';
+                }
+
+                gap += indent;
+                partial = [];
+
+
+                if (Object.prototype.toString.apply(value) === '[object Array]') {
+
+                    length = value.length;
+                    for (i = 0; i < length; i += 1) {
+                        partial[i] = str(i, value) || 'null';
+                    }
+
+                    v = partial.length === 0 ? '[]' :
+                        gap ? '[\n' + gap +
+                            partial.join(',\n' + gap) + '\n' +
+                            mind + ']' :
+                            '[' + partial.join(',') + ']';
+                    gap = mind;
+                    return v;
+                }
+
+                if (rep && typeof rep === 'object') {
+                    length = rep.length;
+                    for (i = 0; i < length; i += 1) {
+                        k = rep[i];
+                        if (typeof k === 'string') {
+                            v = str(k, value);
+                            if (v) {
+                                partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            }
+                        }
+                    }
+                } else {
+
+                    for (k in value) {
+                        if (Object.hasOwnProperty.call(value, k)) {
+                            v = str(k, value);
+                            if (v) {
+                                partial.push(quote(k) + (gap ? ': ' : ':') + v);
+                            }
+                        }
+                    }
+                }
+
+                v = partial.length === 0 ? '{}' :
+                    gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
+                        mind + '}' : '{' + partial.join(',') + '}';
+                gap = mind;
+                return v;
+        }
+    }
+
 
     X.mix(X[arguments[1]] = {},{
 
@@ -451,154 +600,73 @@
             xmlHttp.send();
 
         },
-        parse:function(){
+        stringify : function (value, replacer, space) {
+            var i;
+            gap = '';
+            indent = '';
 
+            if (typeof space === 'number') {
+                for (i = 0; i < space; i += 1) {
+                    indent += ' ';
+                }
+
+
+            } else if (typeof space === 'string') {
+                indent = space;
+            }
+
+            rep = replacer;
+            if (replacer && typeof replacer !== 'function' &&
+                (typeof replacer !== 'object' ||
+                    typeof replacer.length !== 'number')) {
+                throw new Error('JSON.stringify');
+            }
+
+
+            return str('', {'': value});
         },
-        xml2json: function(xml, extended) {
-            if(!xml) return {}; // quick fail
+        parse : function (text, reviver) {
+            var j;
 
-            //### PARSER LIBRARY
-            // Core function
-            function parseXML(node, simple){
-                if(!node) return null;
-                var txt = '', obj = null, att = null;
-                var nt = node.nodeType, nn = jsVar(node.localName || node.nodeName);
-                var nv = node.text || node.nodeValue || '';
-                /*DBG*/ //if(window.console) console.log(['x2j',nn,nt,nv.length+' bytes']);
-                if(node.childNodes){
-                    if(node.childNodes.length>0){
-                        /*DBG*/ //if(window.console) console.log(['x2j',nn,'CHILDREN',node.childNodes]);
-                        $.each(node.childNodes, function(n,cn){
-                            var cnt = cn.nodeType, cnn = jsVar(cn.localName || cn.nodeName);
-                            var cnv = cn.text || cn.nodeValue || '';
-                            /*DBG*/ //if(window.console) console.log(['x2j',nn,'node>a',cnn,cnt,cnv]);
-                            if(cnt == 8){
-                                /*DBG*/ //if(window.console) console.log(['x2j',nn,'node>b',cnn,'COMMENT (ignore)']);
-                                return; // ignore comment node
+            function walk(holder, key) {
+
+                var k, v, value = holder[key];
+                if (value && typeof value === 'object') {
+                    for (k in value) {
+                        if (Object.hasOwnProperty.call(value, k)) {
+                            v = walk(value, k);
+                            if (v !== undefined) {
+                                value[k] = v;
+                            } else {
+                                delete value[k];
                             }
-                            else if(cnt == 3 || cnt == 4 || !cnn){
-                                // ignore white-space in between tags
-                                if(cnv.match(/^\s+$/)){
-                                    /*DBG*/ //if(window.console) console.log(['x2j',nn,'node>c',cnn,'WHITE-SPACE (ignore)']);
-                                    return;
-                                };
-                                /*DBG*/ //if(window.console) console.log(['x2j',nn,'node>d',cnn,'TEXT']);
-                                txt += cnv.replace(/^\s+/,'').replace(/\s+$/,'');
-                                // make sure we ditch trailing spaces from markup
-                            }
-                            else{
-                                /*DBG*/ //if(window.console) console.log(['x2j',nn,'node>e',cnn,'OBJECT']);
-                                obj = obj || {};
-                                if(obj[cnn]){
-                                    /*DBG*/ //if(window.console) console.log(['x2j',nn,'node>f',cnn,'ARRAY']);
+                        }
+                    }
+                }
+                return reviver.call(holder, key, value);
+            }
 
-                                    // http://forum.jquery.com/topic/jquery-jquery-xml2json-problems-when-siblings-of-the-same-tagname-only-have-a-textnode-as-a-child
-                                    if(!obj[cnn].length) obj[cnn] = myArr(obj[cnn]);
-                                    obj[cnn] = myArr(obj[cnn]);
+            text = String(text);
+            cx['lastIndex'] = 0;
+            if (cx.test(text)) {
+                text = text.replace(cx, function (a) {
+                    return '\\u' +
+                        ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+                });
+            }
 
-                                    obj[cnn][ obj[cnn].length ] = parseXML(cn, true/* simple */);
-                                    obj[cnn].length = obj[cnn].length;
-                                }
-                                else{
-                                    /*DBG*/ //if(window.console) console.log(['x2j',nn,'node>g',cnn,'dig deeper...']);
-                                    obj[cnn] = parseXML(cn);
-                                };
-                            };
-                        });
-                    };//node.childNodes.length>0
-                };//node.childNodes
-                if(node.attributes){
-                    if(node.attributes.length>0){
-                        /*DBG*/ //if(window.console) console.log(['x2j',nn,'ATTRIBUTES',node.attributes])
-                        att = {}; obj = obj || {};
-                        $.each(node.attributes, function(a,at){
-                            var atn = jsVar(at.name), atv = at.value;
-                            att[atn] = atv;
-                            if(obj[atn]){
-                                /*DBG*/ //if(window.console) console.log(['x2j',nn,'attr>',atn,'ARRAY']);
+            if (/^[\],:{}\s]*$/
+                .test(text.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, '@')
+                    .replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, ']')
+                    .replace(/(?:^|:|,)(?:\s*\[)+/g, ''))) {
 
-                                // http://forum.jquery.com/topic/jquery-jquery-xml2json-problems-when-siblings-of-the-same-tagname-only-have-a-textnode-as-a-child
-                                //if(!obj[atn].length) obj[atn] = myArr(obj[atn]);//[ obj[ atn ] ];
-                                obj[cnn] = myArr(obj[cnn]);
+                j = eval('(' + text + ')');
 
-                                obj[atn][ obj[atn].length ] = atv;
-                                obj[atn].length = obj[atn].length;
-                            }
-                            else{
-                                /*DBG*/ //if(window.console) console.log(['x2j',nn,'attr>',atn,'TEXT']);
-                                obj[atn] = atv;
-                            };
-                        });
-                        //obj['attributes'] = att;
-                    };//node.attributes.length>0
-                };//node.attributes
-                if(obj){
-                    obj = $.extend( (txt!='' ? new String(txt) : {}),/* {text:txt},*/ obj || {}/*, att || {}*/);
-                    txt = (obj.text) ? (typeof(obj.text)=='object' ? obj.text : [obj.text || '']).concat([txt]) : txt;
-                    if(txt) obj.text = txt;
-                    txt = '';
-                };
-                var out = obj || txt;
-                //console.log([extended, simple, out]);
-                if(extended){
-                    if(txt) out = {};//new String(out);
-                    txt = out.text || txt || '';
-                    if(txt) out.text = txt;
-                    if(!simple) out = myArr(out);
-                };
-                return out;
-            };// parseXML
-            // Core Function End
-            // Utility functions
-            var jsVar = function(s){ return String(s || '').replace(/-/g,"_"); };
+                return typeof reviver === 'function' ?
+                    walk({'': j}, '') : j;
+            }
 
-            // NEW isNum function: 01/09/2010
-            // Thanks to Emile Grau, GigaTecnologies S.L., www.gigatransfer.com, www.mygigamail.com
-            function isNum(s){
-                // based on utility function isNum from xml2json plugin (http://www.fyneworks.com/ - diego@fyneworks.com)
-                // few bugs corrected from original function :
-                // - syntax error : regexp.test(string) instead of string.test(reg)
-                // - regexp modified to accept  comma as decimal mark (latin syntax : 25,24 )
-                // - regexp modified to reject if no number before decimal mark  : ".7" is not accepted
-                // - string is "trimmed", allowing to accept space at the beginning and end of string
-                var regexp=/^((-)?([0-9]+)(([\.\,]{0,1})([0-9]+))?$)/
-                return (typeof s == "number") || regexp.test(String((s && typeof s == "string") ? jQuery.trim(s) : ''));
-            };
-            // OLD isNum function: (for reference only)
-            //var isNum = function(s){ return (typeof s == "number") || String((s && typeof s == "string") ? s : '').test(/^((-)?([0-9]*)((\.{0,1})([0-9]+))?$)/); };
-
-            var myArr = function(o){
-
-                // http://forum.jquery.com/topic/jquery-jquery-xml2json-problems-when-siblings-of-the-same-tagname-only-have-a-textnode-as-a-child
-                //if(!o.length) o = [ o ]; o.length=o.length;
-                if(!$.isArray(o)) o = [ o ]; o.length=o.length;
-
-                // here is where you can attach additional functionality, such as searching and sorting...
-                return o;
-            };
-            // Utility functions End
-            //### PARSER LIBRARY END
-
-            // Convert plain text to xml
-            if(typeof xml=='string') xml = $.text2xml(xml);
-
-            // Quick fail if not xml (or if this is a node)
-            if(!xml.nodeType) return;
-            if(xml.nodeType == 3 || xml.nodeType == 4) return xml.nodeValue;
-
-            // Find xml root node
-            var root = (xml.nodeType == 9) ? xml.documentElement : xml;
-
-            // Convert xml to json
-            var out = parseXML(root, true /* simple */);
-
-            // Clean-up memory
-            xml = null; root = null;
-
-            // Send output
-            return out;
         }
-
     });
 
 })(XDF,'Ajax');
