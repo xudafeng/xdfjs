@@ -204,7 +204,9 @@
 })('XDF');
 
 (function(X){
-    var doc = document,EMPTY = '',
+    var doc = document,
+        EMPTY = '',
+        __self = this;
         trim = X.trim,
         isArray = X.isArray,
         isString = X.isString,
@@ -335,6 +337,11 @@
         toggle:function(selector){
 
             __display(selector,'toggle',this.query);
+
+        },
+        viewHeight:function(){
+
+           return __self.top.document.compatMode == "BackCompat" ? window.top.document.body.clientHeight :window.top.document.documentElement.clientHeight;
 
         }
     });
