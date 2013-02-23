@@ -666,6 +666,33 @@
                     walk({'': j}, '') : j;
             }
 
+        },
+        loadXML:function(file){
+            var xmlDoc;
+            try  {
+                xmlDoc=new ActiveXObject("Microsoft.XMLDOM");
+                xmlDoc.async=false;
+                xmlDoc.load(file);
+            }
+            catch(e){
+                try {
+                    xmlDoc=document.implementation.createDocument("","",null);
+                    xmlDoc.async=false;
+                    xmlDoc.load(file);
+                }
+                catch(e){
+                    try {
+                        var xmlhttp = new window.XMLHttpRequest();
+                        xmlhttp.open("GET",file,false);
+                        xmlhttp.send(null);
+                        xmlDoc = xmlhttp.responseXML;
+                    }
+                    catch(e){
+                        error=e.message;
+                    }
+                }
+            }
+            return xmlDoc;
         }
     });
 
