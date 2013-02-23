@@ -222,7 +222,11 @@
                         i.style.display = 'block';
 
                     }else{
-
+                       if(i.style.display == 'none'){
+                           i.style.display = 'block';
+                       }else{
+                           i.style.display = 'none';
+                       }
                     }
                 }
             isString(selector) && (selector = queryHandle(selector));
@@ -302,7 +306,15 @@
         data:function(){
 
         },
-
+        next:function(elm){
+           return elm.nextSibling;
+        },
+        prev:function(elm){
+           return elm.previousSibling;
+        },
+        attr:function(elm,attr){
+            return elm.getAttribute(attr);
+        },
         /**
          * 隐藏元素
          */
@@ -322,7 +334,7 @@
         },
         toggle:function(selector){
 
-            __display(selector,'',this.query);
+            __display(selector,'toggle',this.query);
 
         }
     });
@@ -726,18 +738,10 @@
         }
     });
 })(XDF,'UA');
-(function(X){  //客户端信息
+(function(X){  //动画效果功能
     var __self = this;
 
     X.mix(X[arguments[1]] = {},{
-        system:function(){
 
-        },
-        browser:function(){
-
-        },
-        core:function(){
-
-        }
     });
 })(XDF,'ANIM');
