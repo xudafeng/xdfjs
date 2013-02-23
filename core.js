@@ -1,3 +1,8 @@
+/*
+* author:xudafeng
+* email:dafeng.xdf@taobao.com
+* descript:做个常用类库，自己使用方便
+* */
 (function (X) {
 
     var __self = this,
@@ -284,6 +289,15 @@
                return null;
            }
 
+        },
+
+        create:function(elm){
+
+           return doc.createElement(elm);
+
+        },
+        html:function(elm,html){
+           elm.innerHTML = html;
         },
         data:function(){
 
