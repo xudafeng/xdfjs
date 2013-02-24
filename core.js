@@ -6,6 +6,7 @@
 (function (X) {
 
     var __self = this,
+
         X = __self[arguments[0]] = {
 
             /**
@@ -23,7 +24,6 @@
 
             return  option ==  Object.prototype.toString.call(source);
         };
-
 
     //基础工具方法
     X.mix(X, {
@@ -115,8 +115,6 @@
          * 引入模块
          */
         import:function(mod,fn){
-
-            var __self = this;
 
             X.mix(X[mod] = {},fn.call(__self,X,X[mod]));
 
@@ -222,6 +220,7 @@ XDF.import('DOM',function(X){
         isArray = X.isArray,
         isString = X.isString,
         isNodeList = X.isNodeList,
+            console.log(__self),
         __display = function(selector,option,queryHandle){
 
             var __option = function(i){
@@ -761,17 +760,9 @@ XDF.import('UA',function(){
     return UA;
 
 });
-XDF.import('Anim',function(X){
+XDF.import('Anim',function(){
     var X = arguments[0];
     var Anim = {
-        system:function(){
-        },
-        browser:function(){
-
-        },
-        core:function(){
-
-        }
     }
 
     return Anim;
