@@ -234,11 +234,11 @@ XDF.import('DOM',function(X){
 
                 }else{
 
-                    if(i.style.display.toString() ==''){
-
-                        i.style.display = 'none';
-
-                    }
+//                    if(i.style.display.toString() ==''){
+//
+//                        i.style.display = 'none';
+//
+//                    }
 
                     if(i.style.display == 'none'){
 
