@@ -249,8 +249,8 @@ XDF.import('DOM',function(X){
 
             }): __option(selector);
 
-        };
-    var DOM = {
+        },
+        DOM = {
         /**
          * 批量获取dom元素
          */
@@ -380,8 +380,8 @@ XDF.import('Event',function(X){
                 elm['on'+ type]  = handle; //现存的DOM0基本古老方式
             }
 
-        };
-    var Event = {
+        },
+        Event = {
 
         add:function(elm,type,handle){
 
@@ -743,9 +743,8 @@ XDF.import('Ajax',function(){   //ajax模块
 
 });
 XDF.import('UA',function(){
-    var X = arguments[0];
-
-    var UA = {
+    var X = arguments[0],
+        UA = {
         system:function(){
 
         },
@@ -761,8 +760,8 @@ XDF.import('UA',function(){
 
 });
 XDF.import('Anim',function(){
-    var X = arguments[0];
-    var Anim = {
+    var X = arguments[0],
+        Anim = {
     }
 
     return Anim;
