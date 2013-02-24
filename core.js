@@ -112,6 +112,16 @@
 
         },
         /**
+         * 引入模块
+         */
+        import:function(mod,fn){
+
+            var __self = this;
+
+            X.mix(X[mod] = {},fn.call(__self,X));
+
+        },
+        /**
          * 加载工具
          */
         getScript:function(url, success, charset) {
@@ -203,11 +213,12 @@
 
 })('XDF');
 
-(function(X){
-    var doc = document,
+XDF.import('DOM',function(X){
+    var X = arguments[0],
+        doc = document,
         EMPTY = '',
         __self = this;
-        trim = X.trim,
+    trim = X.trim,
         isArray = X.isArray,
         isString = X.isString,
         isNodeList = X.isNodeList,
@@ -215,42 +226,41 @@
 
             var __option = function(i){
 
-                    if(option =='hide'){
+                if(option =='hide'){
 
-                        i.style.display = 'none';
+                    i.style.display = 'none';
 
-                    }else if(option =='show'){
+                }else if(option =='show'){
 
+                    i.style.display = 'block';
+
+                }else{
+                    if(i.style.display == 'none'){
                         i.style.display = 'block';
-
                     }else{
-                       if(i.style.display == 'none'){
-                           i.style.display = 'block';
-                       }else{
-                           i.style.display = 'none';
-                       }
+                        i.style.display = 'none';
                     }
                 }
+            }
             isString(selector) && (selector = queryHandle(selector));
 
             isArray(selector)|| isNodeList (selector) ? X.each(selector,function(i){
 
-                    __option(i);
+                __option(i);
 
-                }): __option(selector);
+            }): __option(selector);
 
         };
-
-    X.mix(X[arguments[1]] = {},{
+    var DOM = {
         /**
          * 批量获取dom元素
          */
         query:function(selector){
 
 
-           var __doc = arguments[1]? arguments[1]:doc,
+            var __doc = arguments[1]? arguments[1]:doc,
 
-               __selector = typeof (selector) === 'string' ?  selector :  selector.toString();
+                __selector = typeof (selector) === 'string' ?  selector :  selector.toString();
 
             __selector = trim(__selector);
 
@@ -278,41 +288,41 @@
                 isArray = X.isArray,
                 isNodeList = X.isNodeList;
 
-           if(__selector){
+            if(__selector){
 
-               if(isArray(__selector)|| isNodeList(__selector)){
+                if(isArray(__selector)|| isNodeList(__selector)){
 
-                   return this.query(selector)[0];
+                    return this.query(selector)[0];
 
-               }else{
+                }else{
 
-                   return this.query(selector);
+                    return this.query(selector);
 
-               }
+                }
 
-           }else{
+            }else{
 
-               return null;
-           }
+                return null;
+            }
 
         },
 
         create:function(elm){
 
-           return doc.createElement(elm);
+            return doc.createElement(elm);
 
         },
         html:function(elm,html){
-           elm.innerHTML = html;
+            elm.innerHTML = html;
         },
         data:function(){
 
         },
         next:function(elm){
-           return elm.nextSibling;
+            return elm.nextSibling;
         },
         prev:function(elm){
-           return elm.previousSibling;
+            return elm.previousSibling;
         },
         attr:function(elm,attr){
             return elm.getAttribute(attr);
@@ -341,14 +351,16 @@
         },
         viewHeight:function(){
 
-           return __self.top.document.compatMode == "BackCompat" ? window.top.document.body.clientHeight :window.top.document.documentElement.clientHeight;
+            return __self.top.document.compatMode == "BackCompat" ? __self.top.document.body.clientHeight :__self.top.document.documentElement.clientHeight;
 
         }
-    });
-})(XDF,'DOM');
+    }
 
-(function(X){
-    var __self = this,
+    return DOM;
+});
+XDF.import('Event',function(X){
+    var X = arguments[0],
+        __self = this,
         D = X.DOM,
         W = window,
         isNodeList = X.isNodeList,
@@ -370,8 +382,7 @@
             }
 
         };
-
-    X.mix(X[arguments[1]] = {},{
+    var Event = {
 
         add:function(elm,type,handle){
 
@@ -429,11 +440,13 @@
             return container;
 
         }
-    });
-})(XDF,'Event');
+    }
 
-(function(X){ //ajax模块
-    var __self = this,
+    return Event;
+});
+XDF.import('Ajax',function(){   //ajax模块
+    var X = arguments[0],
+        __self = this,
         __defaulConfig = {
             method:'POST',//默认post方式
             url:'/',
@@ -592,22 +605,20 @@
         }
     }
 
-
-    X.mix(X[arguments[1]] = {},{
-
+    var Ajax = {
         io:function(__config){
 
-           var method = __config['method']||__defaulConfig['method'],
+            var method = __config['method']||__defaulConfig['method'],
 
-               url =  __config['url']||__defaulConfig['url'],
+                url =  __config['url']||__defaulConfig['url'],
 
-               successHandle = __config['success']||__defaulConfig['success'],
+                successHandle = __config['success']||__defaulConfig['success'],
 
-               async = __config['async']||__defaulConfig['async'],
+                async = __config['async']||__defaulConfig['async'],
 
-               data = __config['data']||__defaulConfig['data'],
+                data = __config['data']||__defaulConfig['data'],
 
-               xmlHttp;
+                xmlHttp;
 
             if (__self.XMLHttpRequest){
 
@@ -727,13 +738,15 @@
             }
             return xmlDoc;
         }
-    });
+    }
 
-})(XDF,'Ajax');
-(function(X){  //客户端信息
-    var __self = this;
+    return Ajax;
 
-    X.mix(X[arguments[1]] = {},{
+});
+XDF.import('UA',function(){
+    var X = arguments[0];
+
+    var UA = {
         system:function(){
 
         },
@@ -743,12 +756,23 @@
         core:function(){
 
         }
-    });
-})(XDF,'UA');
-(function(X){  //动画效果功能
-    var __self = this;
+    }
 
-    X.mix(X[arguments[1]] = {},{
+    return UA;
 
-    });
-})(XDF,'ANIM');
+});
+XDF.import('Anim',function(X){
+    var X = arguments[0];
+    var Anim = {
+        system:function(){
+        },
+        browser:function(){
+
+        },
+        core:function(){
+
+        }
+    }
+
+    return Anim;
+});
