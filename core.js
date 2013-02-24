@@ -218,7 +218,7 @@ XDF.import('DOM',function(X){
         doc = document,
         EMPTY = '',
         __self = this;
-    trim = X.trim,
+        trim = X.trim,
         isArray = X.isArray,
         isString = X.isString,
         isNodeList = X.isNodeList,
