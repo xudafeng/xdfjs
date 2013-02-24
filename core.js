@@ -212,6 +212,7 @@
 })('XDF');
 
 XDF.import('DOM',function(X){
+
     var X = arguments[0],
         doc = document,
         EMPTY = '',
@@ -368,6 +369,7 @@ XDF.import('DOM',function(X){
     return DOM;
 });
 XDF.import('Event',function(X){
+
     var X = arguments[0],
         __self = this,
         D = X.DOM,
@@ -454,6 +456,7 @@ XDF.import('Event',function(X){
     return Event;
 });
 XDF.import('Ajax',function(){   //ajax模块
+
     var X = arguments[0],
         __self = this,
         __defaulConfig = {
@@ -753,6 +756,7 @@ XDF.import('Ajax',function(){   //ajax模块
 
 });
 XDF.import('UA',function(){
+
     var X = arguments[0],
         UA = {
         system:function(){
@@ -770,6 +774,7 @@ XDF.import('UA',function(){
 
 });
 XDF.import('Anim',function(){
+
     var X = arguments[0],
         Anim = {
     }
