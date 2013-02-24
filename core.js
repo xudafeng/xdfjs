@@ -220,7 +220,6 @@ XDF.import('DOM',function(X){
         isArray = X.isArray,
         isString = X.isString,
         isNodeList = X.isNodeList,
-            console.log(__self),
         __display = function(selector,option,queryHandle){
 
             var __option = function(i){
