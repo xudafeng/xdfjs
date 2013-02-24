@@ -118,7 +118,7 @@
 
             var __self = this;
 
-            X.mix(X[mod] = {},fn.call(__self,X));
+            X.mix(X[mod] = {},fn.call(__self,X,X[mod]));
 
         },
         /**
