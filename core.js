@@ -233,10 +233,21 @@ XDF.import('DOM',function(X){
                     i.style.display = 'block';
 
                 }else{
-                    if(i.style.display == 'none'){
-                        i.style.display = 'block';
-                    }else{
+
+                    if(i.style.display.toString() ==''){
+
                         i.style.display = 'none';
+
+                    }
+
+                    if(i.style.display == 'none'){
+
+                        i.style.display = 'block';
+
+                    }else {
+
+                        i.style.display = 'none';
+
                     }
                 }
             }
