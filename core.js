@@ -322,6 +322,9 @@ XDF.import('DOM',function(X){
             return doc.createElement(elm);
 
         },
+        remove:function(elm){
+            doc.removeElements(elm);
+        },
         html:function(elm,html){
             elm.innerHTML = html;
         },
