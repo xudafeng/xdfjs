@@ -12,7 +12,7 @@
             /**
              * 基础框架功能：对象深拷贝，同名子对象直接覆盖
              */
-            mix:function (r, s) {
+            add:function (r, s) {
                 for(var i in s){
                     r[i] = s[i];
                 }
@@ -26,7 +26,7 @@
         };
 
     //基础工具方法
-    X.mix(X, {
+    X.add(X, {
         //版本信息
         version:'1.0.0',
 
@@ -116,13 +116,13 @@
          */
         import:function(mod,fn){
 
-            X.mix(X[mod] = {},fn.call(__self,X,X[mod]));
+            X.add(X[mod] = {},fn.call(__self,X,X[mod]));
 
         },
         /**
          * 加载工具
          */
-        getScript:function(url, success, charset) {
+        __getScript:function(url, success, charset) {
             if (utils.isCss(url)) {
                 return S.getStyle(url, success, charset);
             }
@@ -181,7 +181,7 @@
         /**
          * 加载样式
          */
-        getStyle:function(url, success, charset) {
+        __getStyle:function(url, success, charset) {
             var doc = document,
                 head = utils.docHead(),
                 node = doc.createElement('link'),
