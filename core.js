@@ -1,7 +1,7 @@
 /*
  * author:xudafeng
  * email:dafeng.xdf@taobao.com
- * descript:做个常用类库，自己使用方便
+ * descript:写个常用类库，自己使用方便
  * */
 (function (X) {
 
@@ -110,6 +110,9 @@
 
             return __isXDF(source,'[object Function]');
 
+        },
+        isNumber:function(source){
+            return __isXDF(source,'[object Number]');
         },
         /**
          * 引入模块
@@ -238,7 +241,14 @@
             head.appendChild(node);
             return node;
 
+        },
+        /**
+         * 自定义事件
+         */
+        __okEvent :function(){
+
         }
+
 
     });
 
@@ -267,7 +277,7 @@ XDF.install('DOM',function(X){
 
                     i.style.display = 'block';
 
-                }else{
+                }else{   //此处有严重bug
 
 //                    if(i.style.display.toString() ==''){
 //
@@ -848,7 +858,7 @@ XDF.install('UA',function(){
              */
             system: undefined,
 
-            //日益火热的apple帝国移动端标准
+            //for apple
             ipad: undefined,
 
             iphone: undefined,
@@ -864,27 +874,31 @@ XDF.install('UA',function(){
         //版本 以及各公司发行版
         var __shellCheck = function(appName,_uaStr){
 
-            if(X.indexOf('windows',_uaStr)){
+            if(X.indexOf('msie',_uaStr)){
                 //ie版本号
                 var _versionTrident = _uaStr.match(/trident.([\d.]+)/);
+
                 var __getVersion = function(str){
-                    var ieVersions = [6,7,8,9,10],
-                        __ver = 0;
-                    X.each(ieVersions,function(i){
+                        var ieVersions = [6,7,8,9,10],
+                            __ver = 0;
 
-                        if(X.indexOf('msie '+i,str)) {
+                        X.each(ieVersions,function(i){
 
-                            __ver =  i;
-                        }
-                    })
+                            if(X.indexOf('msie '+i,str)&&!__ver) {
 
-                    return __ver;
+                                __ver =  i;
+                            }
+                        })
 
+                       return __ver;
                     };
 
                 UA['ie'] = __getVersion(_uaStr);
+
                 UA['core'] = 'ie';
-                UA['trident'] = parseInt(_versionTrident[1]);
+
+                UA['trident'] = _versionTrident ? parseInt(_versionTrident[1]) : undefined;
+
                 return UA['core'];
             }else if(X.indexOf('opera',_uaStr)){
 
@@ -971,7 +985,8 @@ XDF.install('UA',function(){
 });
 XDF.install('Anim',function(X){
 
-    var D = X.DOM,
+    var __self = this,
+        D = X.DOM,
         PI = Math.PI,
         pow = Math.pow,
         sin = Math.sin,
@@ -1084,39 +1099,47 @@ XDF.install('Anim',function(X){
                 return Tween.bounceOut(t * 2 - 1) * .5 + .5;
             }
         };
+    /*
+    S = v * T     总路程 = 速度 * 总时间，导出： v = S/T
+    s = v * t     已走路程 = 速度 * 已用时间，导出：s = S * (t/T)
+    相当于 变化量 = 变化总量 * (已用时间/总时间)
+    开始值 + (结束值 - 开始值) * (当前时间-开始时间) / (动画需要时间) + 单位
+    当变化量等于变化总量时，标志着动画接近尾声，时间耗尽
+    */
     var Anim = function(elm,change,TIME,tween,handle){
 
         var ELEMENT = D.get(elm),
             _tween = Tween[tween];//获取算子
-        /*
-        S = v * T     总路程 = 速度 * 总时间，导出： v = S/T
-        s = v * t     已走路程 = 速度 * 已用时间，导出：s = S * (t/T)
-        相当于 变化量 = 变化总量 * (已用时间/总时间)，而每次 setInterval 都是为元素重设当前变化标量
-        开始值 + (结束值 - 开始值) * (当前时间-开始时间) / (动画需要时间) + 单位
-        当变化量等于变化总量时，标志着动画接近尾声，时间耗尽
-        */
+
         var __init = function(){
             X.each(change,function(i,key){
                 //过滤单位 i,取到计算数值
+                var _suffix = '';
+                if(!X.isNumber(i)){
                     i = parseFloat(i);
-
+                     _suffix = 'px';//这个地方有待改进
+                }
                 //获取开始值，i为结束值
                 var _property = parseFloat(D.css(ELEMENT,key)),
                     _changeTotal = i - _property,  //总体变化量
                     _startTime = X.now();          //开始时间
 
                 //应用效果
+
                 var _exec = setInterval(function(){
+
                     //动画执行
                     var timeRange = (X.now() - _startTime)/TIME;
                     var propertyRange = parseFloat(_property) + _changeTotal * _tween(timeRange);
                     //改变属性
 
-                    D.css(ELEMENT,key,propertyRange);
+                    D.css(ELEMENT,key,propertyRange+_suffix);
                     if(timeRange >=1 ){    //动画结束
                         clearInterval(_exec)
+                        //直接回调
+                        handle.call(__self);
                     }
-                },16);//没弄明白之前用16吧
+                },16);//前车之鉴，用16吧
             })
         }
 
@@ -1125,7 +1148,6 @@ XDF.install('Anim',function(X){
                 __init();
             },
             stop:function(){
-
             },
             pause:function(){
 
