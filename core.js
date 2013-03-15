@@ -158,94 +158,66 @@
         /**
          * 加载工具
          */
-        __getScript:function(url, success, charset) {
-            if (utils.isCss(url)) {
-                return S.getStyle(url, success, charset);
-            }
+        getScript:function(url, success, charset) {
+
             var doc = document,
-                head = doc.head || doc.getElementsByTagName("head")[0],
+                head = doc.head || doc.getElementsByTagName("head")[0] || doc.documentElement,
                 node = doc.createElement('script'),
-                config = success,
-                error,
-                timeout,
-                timer;
-
-            if (S.isPlainObject(config)) {
-                success = config.success;
-                error = config.error;
-                timeout = config.timeout;
-                charset = config.charset;
-            }
-
-            function clearTimer() {
-                if (timer) {
-                    timer.cancel();
-                    timer = undefined;
-                }
-            }
+                handle = success;
 
             node.src = url;
             node.async = true;
             if (charset) {
                 node.charset = charset;
             }
-            if (success || error) {
-                scriptOnload(node, function() {
-                    clearTimer();
-                    S.isFunction(success) && success.call(node);
-                });
 
-                if (S.isFunction(error)) {
-
-                    //标准浏览器
-                    if (doc.addEventListener) {
-                        node.addEventListener("error", function() {
-                            clearTimer();
-                            error.call(node);
-                        }, false);
-                    }
-
-                    timer = S.later(function() {
-                        timer = undefined;
-                        error();
-                    }, (timeout || this.Config.timeout) * MILLISECONDS_OF_SECOND);
-                }
+            //标准浏览器
+            if (doc.addEventListener) {
+                node.addEventListener("load",handle, false);
             }
+
             head.insertBefore(node, head.firstChild);
             return node;
         },
         /**
          * 加载样式
          */
-        __getStyle:function(url, success, charset) {
+        getStyle:function(url, success, charset) {
+
             var doc = document,
-                head = utils.docHead(),
+                head = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
+                //新增节点
                 node = doc.createElement('link'),
-                config = success;
-
-            if (S.isPlainObject(config)) {
-                success = config.success;
-                charset = config.charset;
-            }
-
-            node.href = url;
+                handle = success;
+            //设置下载url 以及rel 类型
             node.rel = 'stylesheet';
+            node.href = url;
 
+            //设置编码
             if (charset) {
                 node.charset = charset;
             }
 
-            if (success) {
-                utils.scriptOnload(node, success);
-            }
+            //css onload执行
+            node.addEventListener('load', handle, false);
+
             head.appendChild(node);
             return node;
-
         },
         /**
          * 自定义事件
          */
-        __okEvent :function(){
+        EventTarget :{
+
+              on:function(){
+
+              },
+              fire:function(){
+
+              },
+              publish:function(){
+
+              }
 
         }
 
