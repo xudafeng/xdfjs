@@ -2,6 +2,7 @@
  * author:xudafeng
  * email:dafeng.xdf@taobao.com
  * descript:写个常用类库，自己使用方便
+ * 还未添加依赖关系处理
  * */
 (function (X) {
 
@@ -20,10 +21,12 @@
             }
         },
         EMPTY = '',
+
         __isXDF = function(source,option){
 
             return  option ==  Object.prototype.toString.call(source);
         },
+
         __eventTarget = {};
 
     //基础工具方法
@@ -47,10 +50,13 @@
         each:function (object, fn) {
 
             if(object){
+
                 for(var i in object){
+
                     if(i !== 'length' && i !== 'item'){
                         fn.call(__self,object[i],i);
                     }
+
                 }
             }
             return object;
@@ -63,28 +69,39 @@
         trim: function (str) {
 
             if(typeof str === 'string'){
-                return  str.replace(/^\s*|\s*$/g,EMPTY);
-            }else{
-                return null;
-            }
 
+                return  str.replace(/^\s*|\s*$/g,EMPTY);
+
+            }else{
+
+                return null;
+
+            }
 
         },
         /**
          * 返回当前时间戳
          */
         now:function(){
+
             return +new Date();
+
         },
         /**
          * 封装字符探针indexof
          */
         indexOf:function (i, objective) {
+
             if(objective){
+
                 if(objective.indexOf(i) !== -1){
+
                     return true;
+
                 }else{
+
                     return false;
+
                 }
             }
         },
@@ -146,17 +163,21 @@
         $ : function(elm){
 
            return X.DOM.get(elm);
+
         },
         /**
          * 定时器
          */
         timer : function(handle,time,bool){
+
           if(bool){
               //循环插入
               setInterval(handle,time)
+
           }else{
               //插入定时器
               setTimeout(handle,time);
+
           }
 
         },
@@ -172,6 +193,7 @@
 
             node.src = url;
             node.async = true;
+
             if (charset) {
                 node.charset = charset;
             }
@@ -182,6 +204,7 @@
             }
 
             head.insertBefore(node, head.firstChild);
+
             return node;
         },
         /**
@@ -207,6 +230,7 @@
             node.addEventListener('load', handle, false);
 
             head.appendChild(node);
+
             return node;
         },
         /**
@@ -329,7 +353,9 @@ XDF.install('DOM',function(X){
             get:function(selector){
 
                 var __selector =  this.query(selector),
+
                     isArray = X.isArray,
+
                     isNodeList = X.isNodeList;
 
                 if(__selector){
@@ -357,22 +383,32 @@ XDF.install('DOM',function(X){
 
             },
             remove:function(elm){
+
                 doc.removeElements(elm);
+
             },
             html:function(elm,html){
+
                 elm.innerHTML = html;
+
             },
             data:function(){
 
             },
             next:function(elm){
+
                 return elm.nextSibling;
+
             },
             prev:function(elm){
+
                 return elm.previousSibling;
+
             },
             attr:function(elm,attr){
+
                 return elm.getAttribute(attr);
+
             },
             /**
              * 隐藏元素
@@ -404,14 +440,19 @@ XDF.install('DOM',function(X){
             css:function(elm,style,value){   //这里没有做ie低版本兼容
 
                 if(X.isString(elm)){
+
                     elm = $(elm);
                 }
 
                 if(typeof(__self.getComputedStyle) == 'undefined'){
+
                     return false;
+
                 }
                 if(value){
+
                     elm.style[style] = value;
+
                 }else{
                     return  getComputedStyle(elm)[style];
                 }
@@ -470,6 +511,7 @@ XDF.install('Event',function(X){
             on:function(elm,type,handle){    //直接调用add
 
                 this.add.apply(__self,arguments);
+
                 return elm;
 
             },
@@ -546,7 +588,9 @@ XDF.install('Ajax',function(){   //ajax模块
         String.prototype.toJSON =
             Number.prototype.toJSON =
                 Boolean.prototype.toJSON = function (key) {
+
                     return this.valueOf();
+
                 };
     }
 
@@ -569,11 +613,15 @@ XDF.install('Ajax',function(){   //ajax模块
     function quote(string) {
 
         escapable['lastIndex'] = 0;
+
         return escapable.test(string) ?
             '"' + string.replace(escapable, function (a) {
+
                 var c = meta[a];
+
                 return typeof c === 'string' ? c :
                     '\\u' + ('0000' + a.charCodeAt(0).toString(16)).slice(-4);
+
             }) + '"' :
             '"' + string + '"';
     }
@@ -592,16 +640,20 @@ XDF.install('Ajax',function(){   //ajax模块
 
         if (value && typeof value === 'object' &&
             typeof value.toJSON === 'function') {
+
             value = value.toJSON(key);
         }
 
 
         if (typeof rep === 'function') {
+
             value = rep.call(holder, key, value);
+
         }
 
 
         switch (typeof value) {
+
             case 'string':
                 return quote(value);
 
@@ -621,12 +673,14 @@ XDF.install('Ajax',function(){   //ajax模块
                 }
 
                 gap += indent;
+
                 partial = [];
 
 
                 if (Object.prototype.toString.apply(value) === '[object Array]') {
 
                     length = value.length;
+
                     for (i = 0; i < length; i += 1) {
                         partial[i] = str(i, value) || 'null';
                     }
@@ -637,11 +691,14 @@ XDF.install('Ajax',function(){   //ajax模块
                             mind + ']' :
                             '[' + partial.join(',') + ']';
                     gap = mind;
+
                     return v;
                 }
 
                 if (rep && typeof rep === 'object') {
+
                     length = rep.length;
+
                     for (i = 0; i < length; i += 1) {
                         k = rep[i];
                         if (typeof k === 'string') {
@@ -651,6 +708,7 @@ XDF.install('Ajax',function(){   //ajax模块
                             }
                         }
                     }
+
                 } else {
 
                     for (k in value) {
@@ -667,11 +725,13 @@ XDF.install('Ajax',function(){   //ajax模块
                     gap ? '{\n' + gap + partial.join(',\n' + gap) + '\n' +
                         mind + '}' : '{' + partial.join(',') + '}';
                 gap = mind;
+
                 return v;
         }
     }
 
     var Ajax = {
+
         io:function(__config){
 
             var method = __config['method']||__defaulConfig['method'],
@@ -690,6 +750,7 @@ XDF.install('Ajax',function(){   //ajax模块
 
                 xmlHttp=new XMLHttpRequest();
             }
+
             else{           //for IE6, IE5
 
                 xmlHttp=new ActiveXObject("Microsoft.XMLHTTP");
@@ -705,8 +766,11 @@ XDF.install('Ajax',function(){   //ajax模块
             }
 
             xmlHttp.open(method,url+'?t='+ X.now(),async);
+
             xmlHttp.setRequestHeader('Content-type','application/x-www-form-urlencoded');
+
             xmlHttp.setRequestHeader('data',data);
+
             xmlHttp.send();
 
         },
@@ -891,6 +955,7 @@ XDF.install('UA',function(){
                 UA['trident'] = _versionTrident ? parseInt(_versionTrident[1]) : undefined;
 
                 return UA['core'];
+
             }else if(X.indexOf('opera',_uaStr)){
 
             var _versionOpera = _uaStr.match(/version.([\d.]+)/),
@@ -899,10 +964,13 @@ XDF.install('UA',function(){
                 UA['opera'] = _versionOpera[1];
                 UA['core'] = 'opera';
                 UA['presto'] = parseInt(_versionPresto[1]);
+
                 return 'opera';
 
             }else if(X.indexOf('safari',_uaStr)){
+
                 var _versionWebkit = _uaStr.match(/webkit.([\d.]+)/);
+
                 if(X.indexOf('chrome',_uaStr)){
 
                     var _versionChrome = _uaStr.match(/chrome.([\d.]+)/);
@@ -910,6 +978,7 @@ XDF.install('UA',function(){
                     UA['webkit']  = parseInt(_versionWebkit[1]);
                     UA['core'] = 'webkit';
                     return 'chrome';
+
                 } else{
 
                     var _versionSafari = _uaStr.match(/version.([\d.]+)/);
@@ -922,7 +991,8 @@ XDF.install('UA',function(){
 
                 }
 
-            }else if(X.indexOf('firefox',_uaStr)){
+            }else if(X.indexOf('firefox',_uaStr))
+
                 var _versionFirefox = _uaStr.match(/firefox.([\d.]+)/),
                     _versionGecko = _uaStr.match(/gecko.([\d.]+)/);
 
@@ -969,6 +1039,7 @@ XDF.install('UA',function(){
                 return 'andriod';
             }
         }
+
         UA['system'] = __systemCheck(navigator.platform.toLowerCase());
 
     return UA;
@@ -982,7 +1053,10 @@ XDF.install('Anim',function(X){
         pow = Math.pow,
         sin = Math.sin,
         BACK_CONST = 1.70158,
-        Tween = { //添加缓动算子
+        Tween = {
+
+            //添加缓动算子
+
             swing:function(t) {
                 return ( -Math.cos(t * PI) / 2 ) + 0.5;
             },
@@ -1103,14 +1177,20 @@ XDF.install('Anim',function(X){
             _tween = Tween[tween];//获取算子
 
         var __init = function(){
+
             X.each(change,function(i,key){
+
                 //过滤单位 i,取到计算数值
+
                 var _suffix = '';
+
                 if(!X.isNumber(i)){
                     i = parseFloat(i);
                      _suffix = 'px';//这个地方有待改进
                 }
+
                 //获取开始值，i为结束值
+
                 var _property = parseFloat(D.css(ELEMENT,key)),
                     _changeTotal = i - _property,  //总体变化量
                     _startTime = X.now();          //开始时间
@@ -1125,24 +1205,31 @@ XDF.install('Anim',function(X){
                     //改变属性
 
                     D.css(ELEMENT,key,propertyRange+_suffix);
+
                     if(timeRange >=1 ){    //动画结束
                         clearInterval(_exec)
                         //直接回调
                         handle.call(__self);
                     }
+
                 },16);//前车之鉴，用16吧
+
             })
         }
 
         return {
+
             start:function(){
                 __init();
             },
+
             stop:function(){
             },
+
             pause:function(){
 
             },
+
             query:function(){
 
             }
