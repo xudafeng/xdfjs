@@ -23,7 +23,8 @@
         __isXDF = function(source,option){
 
             return  option ==  Object.prototype.toString.call(source);
-        };
+        },
+        __eventTarget = {};
 
     //基础工具方法
     X.add(X, {
@@ -90,7 +91,11 @@
         /**
          * 安全数据类型检测
          */
+        isUndefined:function(source){
 
+            return __isXDF(source,'[object Undefined]');
+
+        },
         isArray :function (source) {
 
             return __isXDF(source,'[object Array]');
@@ -205,19 +210,33 @@
             return node;
         },
         /**
-         * 自定义事件
+         * 自定义事件，观察者模式
          */
-        EventTarget :{
 
-              on:function(){
+        EventTarget:{
 
-              },
-              fire:function(){
+            on:function(name,handle){
 
-              },
-              publish:function(){
+                __eventTarget[name] = handle;
+
+            },
+            fire:function(name,obj){
+
+              if(!X.isUndefined(__eventTarget[name])){
+
+                __eventTarget[name].call(__self,obj);
 
               }
+            },
+            detach:function(name){
+
+                if(!X.isUndefined(__eventTarget[name])){
+
+                    __eventTarget[name] = null;
+
+                }
+
+            }
 
         }
 
