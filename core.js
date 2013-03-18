@@ -14,9 +14,13 @@
              * 基础框架功能：对象深拷贝，同名子对象直接覆盖
              */
             add:function (r, s) {
+
                 for(var i in s){
+
                     r[i] = s[i];
+
                 }
+
                 return r;
             }
         },
@@ -54,7 +58,9 @@
                 for(var i in object){
 
                     if(i !== 'length' && i !== 'item'){
+
                         fn.call(__self,object[i],i);
+
                     }
 
                 }
@@ -1003,7 +1009,7 @@ XDF.install('UA',function(){
                 UA['core'] = 'gecko';
             }
 
-        }
+
 
         UA['shell'] = __shellCheck(navigator.appName,_uaStr);
 
