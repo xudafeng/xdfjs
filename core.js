@@ -36,7 +36,7 @@
     //基础工具方法
     X.add(X, {
         //版本信息
-        version:'1.0.0',
+        version:'1.0.1',
 
         /**
          * 控制台输出
@@ -168,7 +168,7 @@
          */
         $ : function(elm){
 
-           return X.DOM.get(elm);
+            return X.DOM.get(elm);
 
         },
         /**
@@ -176,15 +176,15 @@
          */
         timer : function(handle,time,bool){
 
-          if(bool){
-              //循环插入
-              setInterval(handle,time)
+            if(bool){
+                //循环插入
+                setInterval(handle,time)
 
-          }else{
-              //插入定时器
-              setTimeout(handle,time);
+            }else{
+                //插入定时器
+                setTimeout(handle,time);
 
-          }
+            }
 
         },
         /**
@@ -220,7 +220,7 @@
 
             var doc = document,
                 head = doc.head || doc.getElementsByTagName('head')[0] || doc.documentElement,
-                //新增节点
+            //新增节点
                 node = doc.createElement('link'),
                 handle = success;
             //设置下载url 以及rel 类型
@@ -252,11 +252,11 @@
             },
             fire:function(name,obj){
 
-              if(!X.isUndefined(__eventTarget[name])){
+                if(!X.isUndefined(__eventTarget[name])){
 
-                __eventTarget[name].call(__self,obj);
+                    __eventTarget[name].call(__self,obj);
 
-              }
+                }
             },
             detach:function(name){
 
@@ -286,55 +286,16 @@ XDF.install('DOM',function(X){
         isArray = X.isArray,
         isString = X.isString,
         isNodeList = X.isNodeList,
-        __display = function(selector,option,queryHandle){
-
-            var __option = function(i){
-
-                if(option =='hide'){
-
-                    i.style.display = 'none';
-
-                }else if(option =='show'){
-
-                    i.style.display = 'block';
-
-                }else{   //此处有严重bug
-
-//                    if(i.style.display.toString() ==''){
-//
-//                        i.style.display = 'none';
-//
-//                    }
-
-                    if(i.style.display == 'none'){
-
-                        i.style.display = 'block';
-
-                    }else {
-
-                        i.style.display = 'none';
-
-                    }
-                }
-            }
-            isString(selector) && (selector = queryHandle(selector));
-
-            isArray(selector)|| isNodeList (selector) ? X.each(selector,function(i){
-
-                __option(i);
-
-            }): __option(selector);
-
-        },
         DOM = {
             /**
              * 批量获取dom元素
              */
             query:function(selector){
 
+
                 var __doc = arguments[1]? arguments[1]:doc,
 
-                    __selector = typeof (selector) === 'string' ?  selector :  selector.toString();
+                    __selector = isString(selector) ?  selector :  selector.toString();
 
                 __selector = trim(__selector);
 
@@ -416,28 +377,7 @@ XDF.install('DOM',function(X){
                 return elm.getAttribute(attr);
 
             },
-            /**
-             * 隐藏元素
-             */
-            hide:function(selector){
 
-
-                __display(selector,'hide',this.query);
-
-            },
-            /**
-             * 显示元素
-             */
-            show:function(selector){
-
-                __display(selector,'show',this.query);
-
-            },
-            toggle:function(selector){
-
-                __display(selector,'toggle',this.query);
-
-            },
             viewHeight:function(){
 
                 return __self.top.document.compatMode == "BackCompat" ? __self.top.document.body.clientHeight :__self.top.document.documentElement.clientHeight;
@@ -463,6 +403,180 @@ XDF.install('DOM',function(X){
                     return  getComputedStyle(elm)[style];
                 }
 
+            },
+            /**
+             * 隐藏元素
+             */
+            hide:function(selector){
+
+                var self = this;
+
+                X.each(self.query(selector),function(i){
+
+                    self.css(i,'display','none');
+
+                })
+
+
+            },
+            /**
+             * 显示元素
+             */
+            show:function(selector){
+
+                var self = this;
+
+                X.each(self.query(selector),function(i){
+
+                    self.css(i,'display','block');
+
+                })
+
+            },
+            toggle:function(selector){
+
+                var self = this;
+
+                X.each(self.query(selector),function(i){
+
+                    if(self.css(i,'display') == 'none'){
+
+                        self.css(i,'display','block');
+
+                    } else{
+
+                        self.css(i,'display','none');
+
+                    }
+
+                })
+
+            },
+            hasClass:function(elm,className){
+
+                if(!X.isUndefined(elm)){
+
+                    var  _elmClassName= (X.isString(elm) ? this.get(elm) :elm ).className,
+
+                        reg = new RegExp('(\\s|^)'+className+'(\\s|$)');
+
+                    return reg.test(_elmClassName);
+                }
+
+
+            },
+            addClass:function(elm,className){
+
+                var self = this,_elm = X.isString(elm) ? this.query(elm) :elm;
+
+                if(isArray(_elm)){
+
+                    X.each(_elm,function(i){
+
+                        if (!self.hasClass(i, className)){
+
+                            i.className += " "+className;
+
+                        }
+
+                    })
+
+                } else{
+
+                    if (!X.isUndefined(_elm)&&!self.hasClass(_elm, className)){
+
+                        _elm.className += " "+className;
+
+                    }
+
+                }
+
+            },
+            removeClass:function(elm,className){
+
+                var self = this,_elm = X.isString(elm) ? this.query(elm) :elm;
+
+                if(isArray(_elm)){
+
+                    X.each(_elm,function(i){
+
+                        if (self.hasClass(i, className)){
+
+                            var reg = new RegExp('(\\s|^)'+className+'(\\s|$)');
+
+                            i.className = i.className.replace(reg,'');
+
+                        }
+
+                    })
+
+                }else{
+
+
+                    if (!X.isUndefined(_elm)&&self.hasClass(_elm, className)){
+
+                        var reg = new RegExp('(\\s|^)'+className+'(\\s|$)');
+
+                        _elm.className = _elm.className.replace(reg,'');
+
+                    }
+
+                }
+
+
+
+            },
+            toggleClass:function(elm,className){
+
+                var self = this,_elm = X.isString(elm) ? this.query(elm) :elm;
+
+                if(isArray(_elm)){
+
+                    X.each(_elm,function(i){
+
+
+                        if (self.hasClass(i, className)){
+
+                            self.removeClass(i, className);
+
+                        }else{
+
+                            self.addClass(i, className);
+                        }
+
+                    })
+
+                }else{
+
+                    if (self.hasClass(_elm, className)){
+
+                        self.removeClass(_elm, className);
+
+                    }else{
+
+                        self.addClass(_elm, className);
+                    }
+
+                }
+
+            },
+            setClass:function(elm,className){
+
+                var self = this,_elm = X.isString(elm) ? this.query(elm) :elm;
+
+                if(isArray(_elm)){
+
+                    X.each(_elm,function(i){
+
+                        i.className = className;
+
+                    })
+
+                }else{
+
+                    _elm.className = className;
+
+                }
             }
         }
 
@@ -929,124 +1043,124 @@ XDF.install('UA',function(){
             android: undefined
 
         };
-        //用户代理信息
-        var _uaStr = navigator.userAgent.toLowerCase();
+    //用户代理信息
+    var _uaStr = navigator.userAgent.toLowerCase();
 
-        //版本 以及各公司发行版
-        var __shellCheck = function(appName,_uaStr){
+    //版本 以及各公司发行版
+    var __shellCheck = function(appName,_uaStr){
 
-            if(X.indexOf('msie',_uaStr)){
-                //ie版本号
-                var _versionTrident = _uaStr.match(/trident.([\d.]+)/);
+        if(X.indexOf('msie',_uaStr)){
+            //ie版本号
+            var _versionTrident = _uaStr.match(/trident.([\d.]+)/);
 
-                var __getVersion = function(str){
-                        var ieVersions = [6,7,8,9,10],
-                            __ver = 0;
+            var __getVersion = function(str){
+                var ieVersions = [6,7,8,9,10],
+                    __ver = 0;
 
-                        X.each(ieVersions,function(i){
+                X.each(ieVersions,function(i){
 
-                            if(X.indexOf('msie '+i,str)&&!__ver) {
+                    if(X.indexOf('msie '+i,str)&&!__ver) {
 
-                                __ver =  i;
-                            }
-                        })
+                        __ver =  i;
+                    }
+                })
 
-                       return __ver;
-                    };
+                return __ver;
+            };
 
-                UA['ie'] = __getVersion(_uaStr);
+            UA['ie'] = __getVersion(_uaStr);
 
-                UA['core'] = 'ie';
+            UA['core'] = 'ie';
 
-                UA['trident'] = _versionTrident ? parseInt(_versionTrident[1]) : undefined;
+            UA['trident'] = _versionTrident ? parseInt(_versionTrident[1]) : undefined;
 
-                return UA['core'];
+            return UA['core'];
 
-            }else if(X.indexOf('opera',_uaStr)){
+        }else if(X.indexOf('opera',_uaStr)){
 
             var _versionOpera = _uaStr.match(/version.([\d.]+)/),
                 _versionPresto = _uaStr.match(/presto.([\d.]+)/);
 
-                UA['opera'] = _versionOpera[1];
-                UA['core'] = 'opera';
-                UA['presto'] = parseInt(_versionPresto[1]);
+            UA['opera'] = _versionOpera[1];
+            UA['core'] = 'opera';
+            UA['presto'] = parseInt(_versionPresto[1]);
 
-                return 'opera';
+            return 'opera';
 
-            }else if(X.indexOf('safari',_uaStr)){
+        }else if(X.indexOf('safari',_uaStr)){
 
-                var _versionWebkit = _uaStr.match(/webkit.([\d.]+)/);
+            var _versionWebkit = _uaStr.match(/webkit.([\d.]+)/);
 
-                if(X.indexOf('chrome',_uaStr)){
+            if(X.indexOf('chrome',_uaStr)){
 
-                    var _versionChrome = _uaStr.match(/chrome.([\d.]+)/);
-                    UA['chrome'] = parseInt(_versionChrome[1]);
-                    UA['webkit']  = parseInt(_versionWebkit[1]);
-                    UA['core'] = 'webkit';
-                    return 'chrome';
+                var _versionChrome = _uaStr.match(/chrome.([\d.]+)/);
+                UA['chrome'] = parseInt(_versionChrome[1]);
+                UA['webkit']  = parseInt(_versionWebkit[1]);
+                UA['core'] = 'webkit';
+                return 'chrome';
 
-                } else{
+            } else{
 
-                    var _versionSafari = _uaStr.match(/version.([\d.]+)/);
+                var _versionSafari = _uaStr.match(/version.([\d.]+)/);
 
-                    UA['safari'] = parseInt(_versionSafari[1]);
-                    UA['webkit']  = parseInt(_versionWebkit[1]);
-                    UA['core'] = 'webkit';
+                UA['safari'] = parseInt(_versionSafari[1]);
+                UA['webkit']  = parseInt(_versionWebkit[1]);
+                UA['core'] = 'webkit';
 
-                    return 'safari';
+                return 'safari';
 
-                }
-
-            }else if(X.indexOf('firefox',_uaStr))
-
-                var _versionFirefox = _uaStr.match(/firefox.([\d.]+)/),
-                    _versionGecko = _uaStr.match(/gecko.([\d.]+)/);
-
-                UA['firefox'] = parseInt(_versionFirefox[1]);
-
-                UA['gecko']  = parseInt(_versionGecko[1]);
-
-                UA['core'] = 'gecko';
             }
 
+        }else if(X.indexOf('firefox',_uaStr))
+
+            var _versionFirefox = _uaStr.match(/firefox.([\d.]+)/),
+                _versionGecko = _uaStr.match(/gecko.([\d.]+)/);
+
+        UA['firefox'] = parseInt(_versionFirefox[1]);
+
+        UA['gecko']  = parseInt(_versionGecko[1]);
+
+        UA['core'] = 'gecko';
+    }
 
 
-        UA['shell'] = __shellCheck(navigator.appName,_uaStr);
 
-        //运行系统 system
-        var  __systemCheck = function(str){
+    UA['shell'] = __shellCheck(navigator.appName,_uaStr);
+
+    //运行系统 system
+    var  __systemCheck = function(str){
 
 
-            if(X.indexOf('mac',str)){
+        if(X.indexOf('mac',str)){
 
-                return 'mac';
+            return 'mac';
 
-            }else if(X.indexOf('win',str)) {
+        }else if(X.indexOf('win',str)) {
 
-                return 'windows';
+            return 'windows';
 
-            }else if(X.indexOf('x11',str)){
+        }else if(X.indexOf('x11',str)){
 
-                return 'unix';
+            return 'unix';
 
-            }else if(X.indexOf('linux',str)){
+        }else if(X.indexOf('linux',str)){
 
-                return 'linux';
-            }else if(X.indexOf('iphone',str)){
+            return 'linux';
+        }else if(X.indexOf('iphone',str)){
 
-                return 'iphone';
+            return 'iphone';
 
-            }else if(X.indexOf('ipad',str)){
+        }else if(X.indexOf('ipad',str)){
 
-                return 'ipad';
+            return 'ipad';
 
-            }else if(X.indexOf('andriod',str)){
+        }else if(X.indexOf('andriod',str)){
 
-                return 'andriod';
-            }
+            return 'andriod';
         }
+    }
 
-        UA['system'] = __systemCheck(navigator.platform.toLowerCase());
+    UA['system'] = __systemCheck(navigator.platform.toLowerCase());
 
     return UA;
 
@@ -1171,12 +1285,12 @@ XDF.install('Anim',function(X){
             }
         };
     /*
-    S = v * T     总路程 = 速度 * 总时间，导出： v = S/T
-    s = v * t     已走路程 = 速度 * 已用时间，导出：s = S * (t/T)
-    相当于 变化量 = 变化总量 * (已用时间/总时间)
-    开始值 + (结束值 - 开始值) * (当前时间-开始时间) / (动画需要时间) + 单位
-    当变化量等于变化总量时，标志着动画接近尾声，时间耗尽
-    */
+     S = v * T     总路程 = 速度 * 总时间，导出： v = S/T
+     s = v * t     已走路程 = 速度 * 已用时间，导出：s = S * (t/T)
+     相当于 变化量 = 变化总量 * (已用时间/总时间)
+     开始值 + (结束值 - 开始值) * (当前时间-开始时间) / (动画需要时间) + 单位
+     当变化量等于变化总量时，标志着动画接近尾声，时间耗尽
+     */
     var Anim = function(elm,change,TIME,tween,handle){
 
         var ELEMENT = D.get(elm),
@@ -1192,7 +1306,7 @@ XDF.install('Anim',function(X){
 
                 if(!X.isNumber(i)){
                     i = parseFloat(i);
-                     _suffix = 'px';//这个地方有待改进
+                    _suffix = 'px';//这个地方有待改进
                 }
 
                 //获取开始值，i为结束值
