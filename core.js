@@ -397,7 +397,15 @@ XDF.install('DOM',function(X){
                 }
                 if(value){
 
-                    elm.style[style] = value;
+                    if(elm[style]){
+
+                        elm.style[style] = value;
+
+                    }else{
+                        elm[0].style  = value;
+                    }
+
+
 
                 }else{
                     return  getComputedStyle(elm)[style];
