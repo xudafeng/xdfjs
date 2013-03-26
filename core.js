@@ -397,12 +397,14 @@ XDF.install('DOM',function(X){
                 }
                 if(value){
 
-                    if(elm[style]){
+                    if(X.isUndefined(elm.style)){
+
+                         elm[0].style  = value;
+
+                    }else{
 
                         elm.style[style] = value;
 
-                    }else{
-                        elm[0].style  = value;
                     }
 
 
