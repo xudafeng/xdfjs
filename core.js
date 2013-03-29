@@ -343,7 +343,21 @@ XDF.install('DOM',function(X){
                 }
 
             },
+            val:function(elm){
 
+                if(isString(elm)){
+
+                    return this.get(elm).value;
+
+                }else{
+
+                    return  elm.value;
+
+                }
+
+
+
+            },
             create:function(elm){
 
                 return doc.createElement(elm);
@@ -371,6 +385,10 @@ XDF.install('DOM',function(X){
 
                 return elm.previousSibling;
 
+            },
+            parent:function(elm){
+
+                return elm.parentNode;
             },
             attr:function(elm,attr){
 
@@ -421,11 +439,19 @@ XDF.install('DOM',function(X){
 
                 var self = this;
 
-                X.each(self.query(selector),function(i){
 
-                    self.css(i,'display','none');
+                if(isArray(selector)) {
 
-                })
+                    X.each(self.query(selector),function(i){
+
+                        self.css(i,'display','none');
+
+                    })
+
+                } else{
+
+                        self.css(selector,'display','none');
+                }
 
 
             },
@@ -436,11 +462,21 @@ XDF.install('DOM',function(X){
 
                 var self = this;
 
-                X.each(self.query(selector),function(i){
+                if(isArray(selector)) {
 
-                    self.css(i,'display','block');
+                    X.each(self.query(selector),function(i){
 
-                })
+                        self.css(i,'display','block');
+
+                    })
+
+                }else{
+
+                    self.css(selector,'display','block');
+
+                }
+
+
 
             },
             toggle:function(selector){
@@ -648,6 +684,8 @@ XDF.install('Event',function(X){
 
             delegate:function(container,selector,type,handle){ //支持事件委托绑定，完成代理功能
 
+
+
                 var container = isString(container) ? D.query(container) : container;
 
                 var __handle = function(e) {
@@ -671,7 +709,9 @@ XDF.install('Event',function(X){
                     })
 
                 }else{
+
                     __add(container,type,__handle);
+
                 }
 
                 return container;
@@ -1306,6 +1346,7 @@ XDF.install('Anim',function(X){
         var ELEMENT = D.get(elm),
             _tween = Tween[tween];//获取算子
 
+
         var __init = function(){
 
             X.each(change,function(i,key){
@@ -1314,7 +1355,7 @@ XDF.install('Anim',function(X){
 
                 var _suffix = '';
 
-                if(!X.isNumber(i)){
+                if(i.toString().indexOf('px') != -1){
                     i = parseFloat(i);
                     _suffix = 'px';//这个地方有待改进
                 }
@@ -1326,18 +1367,16 @@ XDF.install('Anim',function(X){
                     _startTime = X.now();          //开始时间
 
                 //应用效果
-
                 var _exec = setInterval(function(){
 
                     //动画执行
                     var timeRange = (X.now() - _startTime)/TIME;
                     var propertyRange = parseFloat(_property) + _changeTotal * _tween(timeRange);
                     //改变属性
-
                     D.css(ELEMENT,key,propertyRange+_suffix);
 
                     if(timeRange >=1 ){    //动画结束
-                        clearInterval(_exec)
+                        clearInterval(_exec);
                         //直接回调
                         handle.call(__self);
                     }
