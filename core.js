@@ -4,7 +4,7 @@
  * descript:写个常用类库，自己使用方便
  * 还未添加依赖关系处理
  * */
-(function (X) {
+;(function (X) {
 
     var __self = this,
 
